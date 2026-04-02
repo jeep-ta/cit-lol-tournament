@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIT LoL eSports — Bracket</title>
+  <meta name="description" content="Tournament bracket for the CIT LoL eSports 2027 Championship">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;700&family=Barlow:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+  <div class="hex-bg"></div>
+  <div class="app">
+
+    <nav id="main-nav"></nav>
+
+    <div class="panel">
+      <div class="flex-between">
+        <div class="sec-head" style="flex:1;margin-bottom:0">
+          <div class="diamond"></div>
+          <div class="sec-title">Tournament Bracket</div>
+          <div class="sec-line"></div>
+        </div>
+      </div>
+      <div style="height:1rem"></div>
+
+      <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-title">Current Format: <span id="format-name" style="color:var(--white)">Loading...</span>
+        </div>
+        <div id="format-desc" style="font-size:0.82rem;color:var(--text3)"></div>
+      </div>
+
+      <div id="bracket-view">
+        <div class="loading">Loading bracket</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/js/shared.js"></script>
+  <script>
+    let teams = [], matches = [], standings = [], bracketData = {};
+    let currentFormat = 'single';
+
+    const FORMAT_DESC = {
+      single: "Lose once and you're out. Clean, fast, high stakes. Top 6 teams battle through QF → SF → Grand Final.",
+      double: "Every team gets a second chance. Winners and Losers brackets run in parallel. You must lose twice to be eliminated.",
+      roundrobin: "All teams play each other once. Points are accumulated (Win = 3pts, Draw = 1pt). Top 2 advance to finals.",
+      group: "Teams are drawn into groups of 3. Top 2 from each group advance to a single-elimination knockout stage."
+    };
+
+    async function init() {
+      initNav('bracket');
+      try {
+        const [t, m, s, settings] = await Promise.all([
+          API.get('/api/teams'), API.get('/api/matches'), API.get('/api/standings'), API.get('/api/settings')
+        ]);
+        teams = t; matches = m; standings = s;
+        currentFormat = settings.format || 'single';
+        bracketData = settings.bracketData || {};
+        renderBracket();
+      } catch (e) {
+        document.getElementById('bracket-view').innerHTML = '<div class="alert alert-error">Failed to load bracket data.</div>';
+      }
+    }
+
+    // Format selection logic moved to admin panel
+
+    function bMatch(slotId) {
+      const d = (bracketData[currentFormat] && bracketData[currentFormat][slotId]) || { t1: 'TBD', t2: 'TBD', s1: '', s2: '', w: 0 };
+      const esc = str => (str || '');
+      return `<div class="b-match">
+    <div class="b-team ${d.w === 1 ? 'winner' : ''}">${esc(d.t1)}<span class="score">${esc(d.s1)}</span></div>
+    <div class="b-team ${d.w === 2 ? 'winner' : ''}">${esc(d.t2)}<span class="score">${esc(d.s2)}</span></div>
+  </div>`;
+    }
+
+    function renderBracket() {
+      const names = { single: 'Single Elimination', double: 'Double Elimination', roundrobin: 'Round Robin', group: 'Group Stage' };
+      document.getElementById('format-name').textContent = names[currentFormat];
+      document.getElementById('format-desc').textContent = FORMAT_DESC[currentFormat];
+      const v = document.getElementById('bracket-view');
+      if (currentFormat === 'single') v.innerHTML = renderSingleElim();
+      else if (currentFormat === 'double') v.innerHTML = renderDoubleElim();
+      else if (currentFormat === 'roundrobin') v.innerHTML = renderRoundRobin();
+      else v.innerHTML = renderGroupStage();
+    }
+
+    function renderSingleElim() {
+      return `<div class="card"><div class="card-title">Single Elimination — Knockout Stage</div>
+  <div class="bracket-wrap"><div class="bracket">
+    <div class="bracket-round"><div class="round-label">Quarterfinals</div>
+      ${bMatch('qf1')}
+      <div style="height:0.5rem"></div>
+      ${bMatch('qf2')}
+      <div class="b-spacer"></div>
+      ${bMatch('qf3')}
+      <div style="height:0.5rem"></div>
+      ${bMatch('qf4')}
+    </div>
+    <div class="bracket-round"><div class="round-label">Semifinals</div>
+      <div style="height:2rem"></div>
+      ${bMatch('sf1')}
+      <div class="b-spacer"></div>
+      ${bMatch('sf2')}
+    </div>
+    <div class="bracket-round"><div class="round-label">Grand Final</div>
+      <div style="height:5.5rem"></div>
+      ${bMatch('f1')}
+    </div>
+  </div></div></div>`;
+    }
+
+    function renderDoubleElim() {
+      return `<div class="card"><div class="card-title">Double Elimination — Winners Bracket</div>
+  <div class="bracket-wrap"><div class="bracket">
+    <div class="bracket-round"><div class="round-label">Round 1 (W)</div>
+      ${bMatch('w1_1')}
+      <div style="height:0.5rem"></div>
+      ${bMatch('w1_2')}
+      <div style="height:0.5rem"></div>
+      ${bMatch('w1_3')}
+    </div>
+    <div class="bracket-round"><div class="round-label">Semis (W)</div>
+      <div style="height:1.5rem"></div>
+      ${bMatch('wsf_1')}
+      <div class="b-spacer"></div>
+      ${bMatch('wsf_2')}
+    </div>
+    <div class="bracket-round"><div class="round-label">Winners Final</div>
+      <div style="height:4rem"></div>
+      ${bMatch('wf_1')}
+    </div>
+  </div></div></div>
+  <div class="card" style="margin-top:1rem"><div class="card-title">Losers Bracket</div>
+  <div class="bracket-wrap"><div class="bracket">
+    <div class="bracket-round"><div class="round-label">LB Round 1</div>
+      ${bMatch('l1_1')}
+      <div style="height:0.5rem"></div>
+      ${bMatch('l1_2')}
+    </div>
+    <div class="bracket-round"><div class="round-label">LB Round 2</div>
+      <div style="height:1.5rem"></div>
+      ${bMatch('l2_1')}
+    </div>
+    <div class="bracket-round"><div class="round-label">LB Final</div>
+      <div style="height:1.5rem"></div>
+      ${bMatch('lf_1')}
+    </div>
+  </div></div></div>`;
+    }
+
+    function renderRoundRobin() {
+      const abbrevs = teams.map(t => t.name.length > 10 ? t.name.substring(0, 8) + '..' : t.name);
+      let th = abbrevs.map(n => `<th>${n}</th>`).join('');
+
+      // Build results matrix from completed matches
+      const matrix = teams.map(() => teams.map(() => null));
+      matches.filter(m => m.status === 'done').forEach(m => {
+        const i1 = teams.findIndex(t => t.id === m.team1Id);
+        const i2 = teams.findIndex(t => t.id === m.team2Id);
+        if (i1 >= 0 && i2 >= 0) {
+          if (m.score1 > m.score2) { matrix[i1][i2] = 'W'; matrix[i2][i1] = 'L'; }
+          else if (m.score2 > m.score1) { matrix[i1][i2] = 'L'; matrix[i2][i1] = 'W'; }
+        }
+      });
+
+      let rows = teams.map((team, i) => {
+        let cells = matrix[i].map((r, j) => {
+          if (i === j) return '<td class="self">—</td>';
+          if (r === 'W') return '<td class="win">W</td>';
+          if (r === 'L') return '<td class="loss">L</td>';
+          return '<td class="pending">—</td>';
+        }).join('');
+        const w = matrix[i].filter(r => r === 'W').length;
+        const l = matrix[i].filter(r => r === 'L').length;
+        return `<tr><td class="team-name">${team.name}</td>${cells}<td style="color:var(--text2)">${w}</td><td style="color:var(--text2)">${l}</td><td style="font-weight:600;color:var(--primary)">${w * 3}</td></tr>`;
+      }).join('');
+
+      return `<div class="card"><div class="card-title">Round Robin — All vs All</div>
+  <div class="rr-grid"><table class="rr-table">
+    <thead><tr><th>Team</th>${th}<th>W</th><th>L</th><th>Pts</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>
+  <div class="notice" style="margin-top:1rem;margin-bottom:0">Top 2 teams by points advance to the Grand Final. Tiebreakers: head-to-head result → game difference → coin flip.</div>
+  </div>`;
+    }
+
+    function renderGroupStage() {
+      // Split teams into 2 groups based on standings
+      const half = Math.ceil(teams.length / 2);
+      const groupA = standings.slice(0, half);
+      const groupB = standings.slice(half);
+
+      function groupHtml(name, grp) {
+        return `<div class="group-card">
+      <div class="group-header">${name}</div>
+      ${grp.map((t, i) => `<div class="group-team ${i < 2 ? 'advance' : ''}">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:0.7rem;color:var(--text3);min-width:14px">${i + 1}</span>
+          <span class="name">${t.name}</span>
+          ${i < 2 ? '<span class="badge badge-primary" style="font-size:0.6rem;padding:0.1rem 0.4rem">ADV</span>' : ''}
+        </div>
+        <span class="rec">${t.w}-${t.l}</span>
+      </div>`).join('')}
+    </div>`;
+      }
+
+      return `<div class="card"><div class="card-title">Group Stage Draw</div>
+  <div class="groups-grid">${groupHtml('Group A', groupA)}${groupHtml('Group B', groupB)}</div>
+  <div class="divider"></div>
+  <div class="card-title">Knockout Stage — Top 2 from each group</div>
+  <div class="bracket-wrap"><div class="bracket">
+    <div class="bracket-round"><div class="round-label">Semifinals</div>
+      ${bMatch('gs_sf1')}
+      <div style="height:1rem"></div>
+      ${bMatch('gs_sf2')}
+    </div>
+    <div class="bracket-round"><div class="round-label">Grand Final</div>
+      <div style="height:3rem"></div>
+      ${bMatch('gs_f1')}
+    </div>
+  </div></div></div>`;
+    }
+
+    init();
+  </script>
+</body>
+
+</html>

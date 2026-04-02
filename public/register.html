@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIT LoL eSports — Register</title>
+  <meta name="description" content="Register your team for the CIT LoL eSports 2027 Championship">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;700&family=Barlow:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+  <div class="hex-bg"></div>
+  <div class="app">
+
+    <nav id="main-nav"></nav>
+
+    <div class="panel">
+      <div class="grid2" style="align-items:start">
+        <div>
+          <div class="sec-head">
+            <div class="diamond"></div>
+            <div class="sec-title">Team Registration</div>
+            <div class="sec-line"></div>
+          </div>
+
+          <div id="reg-alert" style="display:none"></div>
+
+          <div class="card">
+            <div class="card-title">Team Information</div>
+            <div class="form-group">
+              <label class="form-label">Team Name</label>
+              <input class="form-input" id="reg-team-name" placeholder="e.g., Cipher Squad" maxlength="30">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Section / Year Level</label>
+              <input class="form-input" id="reg-section" placeholder="e.g., BSIT 3A">
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Team Members (5 Players + 1 Sub)</div>
+            <div id="members-form"></div>
+            <div style="margin-top:0.75rem">
+              <button class="btn btn-primary" onclick="registerTeam()" id="reg-submit-btn">Submit Registration</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="sec-head">
+            <div class="diamond"></div>
+            <div class="sec-title">Registered Teams</div>
+            <div class="sec-line"></div>
+          </div>
+          <div id="registered-list">
+            <div class="loading">Loading teams</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/js/shared.js"></script>
+  <script>
+    let teams = [];
+
+    async function init() {
+      initNav('register');
+      buildMembersForm();
+      await loadTeams();
+    }
+
+    async function loadTeams() {
+      try {
+        teams = await API.get('/api/teams');
+        renderRegisteredTeams();
+      } catch (e) {
+        document.getElementById('registered-list').innerHTML = '<div class="alert alert-error">Failed to load teams.</div>';
+      }
+    }
+
+    function buildMembersForm() {
+      let html = '';
+      for (let i = 1; i <= 5; i++) {
+        html += `<div class="member-row">
+      <span class="member-num">Player ${i}${i === 1 ? ' (Cap)' : ''}</span>
+      <input class="form-input" id="mem-name-${i}" placeholder="Full Name" style="flex:1">
+      <input class="form-input" id="mem-ign-${i}" placeholder="In-Game Name (IGN)" style="flex:1;margin-left:6px">
+    </div>`;
+      }
+      html += `<div class="member-row">
+    <span class="member-num">Sub</span>
+    <input class="form-input" id="mem-name-6" placeholder="Full Name (optional)" style="flex:1">
+    <input class="form-input" id="mem-ign-6" placeholder="IGN (optional)" style="flex:1;margin-left:6px">
+  </div>`;
+      document.getElementById('members-form').innerHTML = html;
+    }
+
+    async function registerTeam() {
+      const name = document.getElementById('reg-team-name').value.trim();
+      const section = document.getElementById('reg-section').value.trim();
+
+      if (!name || !section) {
+        showAlert('reg-alert', 'Please fill in the team name and section.', 'warn');
+        return;
+      }
+
+      const members = [];
+      for (let i = 1; i <= 5; i++) {
+        const n = document.getElementById(`mem-name-${i}`).value.trim();
+        const g = document.getElementById(`mem-ign-${i}`).value.trim();
+        if (!n || !g) {
+          showAlert('reg-alert', `Player ${i} name and IGN are required.`, 'warn');
+          return;
+        }
+        members.push({ name: n, ign: g, role: i === 1 ? 'captain' : 'player' });
+      }
+
+      // Optional sub
+      const subName = document.getElementById('mem-name-6').value.trim();
+      const subIgn = document.getElementById('mem-ign-6').value.trim();
+      if (subName && subIgn) {
+        members.push({ name: subName, ign: subIgn, role: 'sub' });
+      }
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.textContent = 'Registering...';
+      btn.disabled = true;
+
+      try {
+        await API.post('/api/teams', { name, section, members });
+        showAlert('reg-alert', `Team "${name}" has been registered successfully!`, 'success');
+
+        // Clear form
+        document.getElementById('reg-team-name').value = '';
+        document.getElementById('reg-section').value = '';
+        for (let i = 1; i <= 6; i++) {
+          document.getElementById(`mem-name-${i}`).value = '';
+          document.getElementById(`mem-ign-${i}`).value = '';
+        }
+
+        await loadTeams();
+      } catch (e) {
+        showAlert('reg-alert', e.message || 'Registration failed.', 'warn');
+      } finally {
+        btn.textContent = 'Submit Registration';
+        btn.disabled = false;
+      }
+    }
+
+    function renderRegisteredTeams() {
+      const el = document.getElementById('registered-list');
+      if (teams.length === 0) {
+        el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text3)">No teams registered yet.</div>';
+        return;
+      }
+      el.innerHTML = teams.map((t, i) => {
+        const igns = t.members ? t.members.filter(m => m.role !== 'sub').map(m => m.ign).join(', ') : '';
+        const statusBadge = t.status === 'confirmed'
+          ? '<span class="badge badge-green">Confirmed</span>'
+          : '<span class="badge badge-primary">Registered</span>';
+        return `<div class="registered-team">
+      <div class="reg-team-info">
+        <div class="team-avatar">${t.name.substring(0, 2).toUpperCase()}</div>
+        <div class="team-detail">
+          <strong>${t.name}</strong>
+          <span>${t.section} · ${igns}</span>
+        </div>
+      </div>
+      ${statusBadge}
+    </div>`;
+      }).join('');
+    }
+
+    init();
+  </script>
+</body>
+
+</html>

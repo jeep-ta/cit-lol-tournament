@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIT LoL eSports — Standings</title>
+  <meta name="description" content="Team standings for the CIT Rift Games 2025 Championship">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;700&family=Barlow:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+  <div class="hex-bg"></div>
+  <div class="app">
+
+    <nav id="main-nav"></nav>
+
+    <div class="panel">
+      <div class="sec-head">
+        <div class="diamond"></div>
+        <div class="sec-title">Standings</div>
+        <div class="sec-line"></div>
+      </div>
+
+      <div class="grid3" style="margin-bottom:1.5rem" id="top-cards">
+        <div class="card" style="padding:1rem;margin-bottom:0">
+          <div
+            style="font-size:0.7rem;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:0.3rem">
+            Current Leader</div>
+          <div id="leader-name"
+            style="font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;color:var(--primary)">—</div>
+          <div id="leader-detail" style="font-size:0.75rem;color:var(--text3)">Loading...</div>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:0">
+          <div
+            style="font-size:0.7rem;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:0.3rem">
+            Total Matches Played</div>
+          <div id="total-matches"
+            style="font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;color:var(--blue)">—</div>
+          <div style="font-size:0.75rem;color:var(--text3)">Completed games</div>
+        </div>
+        <div class="card" style="padding:1rem;margin-bottom:0">
+          <div
+            style="font-size:0.7rem;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:0.3rem">
+            Active Teams</div>
+          <div id="active-teams"
+            style="font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;color:var(--white)">—</div>
+          <div style="font-size:0.75rem;color:var(--text3)">Registered in tournament</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Overall Standings</div>
+        <div style="font-size:0.78rem;color:var(--text3);margin-bottom:1rem">Auto-calculated from match results. Win = 3
+          pts.</div>
+        <table class="standings-table" id="standings-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Team</th>
+              <th>W</th>
+              <th>L</th>
+              <th>GW</th>
+              <th>GL</th>
+              <th>Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="7" class="loading">Loading standings</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/js/shared.js"></script>
+  <script>
+    async function init() {
+      initNav('standings');
+      try {
+        const [standings, matches, teams] = await Promise.all([
+          API.get('/api/standings'), API.get('/api/matches'), API.get('/api/teams')
+        ]);
+
+        // Top cards
+        if (standings.length > 0) {
+          document.getElementById('leader-name').textContent = standings[0].name;
+          document.getElementById('leader-detail').textContent = `${standings[0].section} · ${standings[0].w}W ${standings[0].l}L`;
+        }
+        const doneCount = matches.filter(m => m.status === 'done').length;
+        document.getElementById('total-matches').textContent = doneCount;
+        document.getElementById('active-teams').textContent = teams.length;
+
+        // Standings table
+        let html = '';
+        const playoffLine = Math.min(2, standings.length);
+        standings.forEach((s, i) => {
+          const rc = s.rank <= 3 ? ['rank-1', 'rank-2', 'rank-3'][s.rank - 1] : 'rank-other';
+          html += `<tr>
+        <td><span class="rank-badge ${rc}">${s.rank}</span></td>
+        <td><div class="team-name-cell">${s.name}</div><div class="team-sect">${s.section}</div></td>
+        <td class="stat-good">${s.w}</td>
+        <td class="stat-bad">${s.l}</td>
+        <td>${s.gw}</td>
+        <td>${s.gl}</td>
+        <td style="font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--primary)">${s.pts}</td>
+      </tr>`;
+          if (s.rank === playoffLine && i < standings.length - 1) {
+            html += `<tr class="separator-row"><td colspan="7">— Playoff Cutoff —</td></tr>`;
+          }
+        });
+        document.querySelector('#standings-table tbody').innerHTML = html;
+
+      } catch (e) {
+        document.querySelector('#standings-table tbody').innerHTML = '<tr><td colspan="7" class="alert alert-error">Failed to load standings.</td></tr>';
+      }
+    }
+
+    init();
+  </script>
+</body>
+
+</html>

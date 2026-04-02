@@ -1,0 +1,219 @@
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#0BC4E3;--primary-light:#4DD0E1;--primary-dark:#00838F;
+  --blue:#0BC4E3;--blue-dark:#091428;--blue-mid:#0A1428;
+  --surface:#111111;--surface2:#1A1A1A;--surface3:#222222;
+  --border:#333333;--border2:#444444;
+  --text:#E0E0E0;--text2:#C0C0C0;--text3:#808080;
+  --red:#C62626;--green:#00A36C;--orange:#E3961A;
+  --white:#F0E6D3;
+}
+body{font-family:'Barlow',sans-serif;background:#050505;color:var(--text2);min-height:100vh;overflow-x:hidden}
+
+.hex-bg{position:fixed;inset:0;background:
+  radial-gradient(ellipse 60% 50% at 50% 0%,rgba(11,196,227,0.06) 0%,transparent 70%),
+  radial-gradient(ellipse 40% 30% at 80% 80%,rgba(11,196,227,0.05) 0%,transparent 60%),
+  #050505;z-index:0;pointer-events:none}
+
+.app{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 1rem 3rem}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 0;border-bottom:1px solid var(--border);margin-bottom:2rem}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:36px;height:36px}
+.logo-text{font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;color:var(--primary);letter-spacing:2px;text-transform:uppercase}
+.logo-sub{font-size:0.65rem;color:var(--text3);letter-spacing:3px;text-transform:uppercase;display:block;margin-top:-4px}
+.nav-tabs{display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.nav-tab{padding:0.5rem 1.1rem;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:0.9rem;letter-spacing:1.5px;text-transform:uppercase;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .2s;border-right:1px solid var(--border);text-decoration:none;display:inline-flex;align-items:center}
+.nav-tab:last-child{border-right:none}
+.nav-tab.active,.nav-tab:hover{background:rgba(11,196,227,0.1);color:var(--primary)}
+
+/* PANELS */
+.panel{animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* SECTION HEADER */
+.sec-head{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
+.sec-line{flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent)}
+.sec-title{font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;color:var(--primary);letter-spacing:3px;text-transform:uppercase;white-space:nowrap}
+.diamond{width:8px;height:8px;background:var(--primary);transform:rotate(45deg);flex-shrink:0}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.25rem;margin-bottom:1rem}
+.card-title{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--primary);letter-spacing:1px;text-transform:uppercase;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border)}
+
+/* GRID */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+@media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr}}
+
+/* FORM */
+.form-group{margin-bottom:0.85rem}
+.form-label{font-size:0.75rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:0.35rem;display:block}
+.form-input,.form-select{width:100%;padding:0.6rem 0.85rem;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--white);font-family:'Barlow',sans-serif;font-size:0.9rem;outline:none;transition:border .2s}
+.form-input:focus,.form-select:focus{border-color:var(--primary)}
+.form-select option{background:#111111}
+.form-note{font-size:0.75rem;color:var(--text3);margin-top:0.3rem}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:0.6rem 1.5rem;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:0.9rem;letter-spacing:2px;text-transform:uppercase;border:none;border-radius:3px;cursor:pointer;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,#0BC4E3,#00838F);color:#1a1200}
+.btn-primary:hover{filter:brightness(1.15)}
+.btn-outline{background:transparent;border:1px solid var(--primary);color:var(--primary)}
+.btn-outline:hover{background:rgba(11,196,227,0.1)}
+.btn-danger{background:rgba(198,38,38,0.15);border:1px solid var(--red);color:#ff6b6b}
+.btn-danger:hover{background:rgba(198,38,38,0.25)}
+.btn-sm{padding:0.35rem 0.85rem;font-size:0.75rem}
+
+.badge{display:inline-block;padding:0.2rem 0.6rem;border-radius:3px;font-size:0.7rem;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.badge-primary{background:rgba(11,196,227,0.15);color:var(--primary);border:1px solid rgba(11,196,227,0.3)}
+.badge-blue{background:rgba(11,196,227,0.1);color:var(--blue);border:1px solid rgba(11,196,227,0.2)}
+.badge-red{background:rgba(198,38,38,0.1);color:#ff6b6b;border:1px solid rgba(198,38,38,0.2)}
+.badge-green{background:rgba(0,163,108,0.1);color:#00e896;border:1px solid rgba(0,163,108,0.2)}
+.badge-gray{background:rgba(92,122,153,0.1);color:var(--text3);border:1px solid rgba(92,122,153,0.2)}
+
+/* ELIGIBILITY */
+.elig-item{display:flex;align-items:flex-start;gap:10px;padding:0.7rem 0;border-bottom:1px solid var(--border)}
+.elig-item:last-child{border-bottom:none}
+.elig-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:11px;font-weight:700}
+.elig-icon.check{background:rgba(0,163,108,0.15);color:#00e896;border:1px solid rgba(0,163,108,0.3)}
+.elig-icon.x{background:rgba(198,38,38,0.15);color:#ff6b6b;border:1px solid rgba(198,38,38,0.3)}
+.elig-text{font-size:0.88rem;color:var(--text2)}
+.elig-text strong{color:var(--white);display:block;margin-bottom:2px;font-size:0.9rem}
+
+/* SCHEDULE */
+.match-card{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0.9rem 1.1rem;margin-bottom:0.6rem;display:flex;align-items:center;gap:1rem;transition:border-color .2s}
+.match-card:hover{border-color:var(--border2)}
+.match-date{font-size:0.7rem;color:var(--text3);letter-spacing:1px;text-transform:uppercase;min-width:80px;text-align:center}
+.match-date .day{font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;color:var(--text2);display:block}
+.match-vs{flex:1;display:flex;align-items:center;justify-content:center;gap:1rem}
+.match-team{font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;color:var(--white);text-align:center;min-width:100px}
+.match-team.left{text-align:right}
+.match-score{font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;color:var(--primary);min-width:60px;text-align:center}
+.match-score.pending{color:var(--text3);font-size:0.9rem}
+.match-status{min-width:80px;text-align:right}
+.match-info{font-size:0.72rem;color:var(--text3)}
+.vs-divider{font-size:0.7rem;font-weight:700;color:var(--text3);letter-spacing:2px}
+
+/* BRACKET */
+.bracket-controls{display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.format-btn{padding:0.4rem 1rem;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:0.8rem;letter-spacing:1.5px;text-transform:uppercase;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--text3);cursor:pointer;transition:all .2s}
+.format-btn.active,.format-btn:hover{border-color:var(--primary);color:var(--primary);background:rgba(11,196,227,0.08)}
+
+.bracket-wrap{overflow-x:auto;padding-bottom:1rem}
+.bracket{display:flex;gap:2rem;align-items:flex-start;min-width:500px}
+.bracket-round{display:flex;flex-direction:column;gap:0;min-width:160px}
+.round-label{font-family:'Rajdhani',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);text-align:center;margin-bottom:0.75rem}
+.b-match{background:var(--surface2);border:1px solid var(--border);border-radius:3px;margin-bottom:1rem;overflow:hidden}
+.b-team{padding:0.5rem 0.75rem;font-family:'Rajdhani',sans-serif;font-size:0.9rem;font-weight:600;color:var(--text2);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.b-team:last-child{border-bottom:none}
+.b-team.winner{color:var(--primary);background:rgba(11,196,227,0.05)}
+.b-team .score{font-size:0.8rem;color:var(--text3)}
+.b-team.winner .score{color:var(--primary)}
+.b-spacer{height:2.1rem}
+
+/* STANDINGS */
+.standings-table{width:100%;border-collapse:collapse;font-size:0.88rem}
+.standings-table th{font-family:'Rajdhani',sans-serif;font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:0.5rem 0.75rem;text-align:left;border-bottom:1px solid var(--border)}
+.standings-table th:not(:first-child){text-align:center}
+.standings-table td{padding:0.65rem 0.75rem;border-bottom:1px solid rgba(51,51,51,0.4);color:var(--text2)}
+.standings-table td:not(:first-child){text-align:center}
+.standings-table tr:hover td{background:rgba(11,196,227,0.03)}
+.rank-badge{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:0.8rem}
+.rank-1{background:rgba(11,196,227,0.2);color:var(--primary);border:1px solid rgba(11,196,227,0.4)}
+.rank-2{background:rgba(92,122,153,0.2);color:#8fa8c0;border:1px solid rgba(92,122,153,0.4)}
+.rank-3{background:rgba(9,160,185,0.2);color:#b8895a;border:1px solid rgba(9,160,185,0.4)}
+.rank-other{background:rgba(51,51,51,0.2);color:var(--text3);border:1px solid var(--border)}
+.team-name-cell{font-family:'Rajdhani',sans-serif;font-size:0.95rem;font-weight:600;color:var(--white)}
+.team-sect{font-size:0.72rem;color:var(--text3);font-family:'Barlow',sans-serif;font-weight:400}
+.stat-good{color:#00e896}
+.stat-bad{color:#ff6b6b}
+.separator-row td{background:var(--surface);padding:0.3rem 0.75rem;font-size:0.7rem;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
+
+/* REGISTRATION */
+.registered-team{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0.85rem 1rem;margin-bottom:0.6rem;display:flex;align-items:center;justify-content:space-between}
+.reg-team-info{display:flex;align-items:center;gap:10px}
+.team-avatar{width:32px;height:32px;border-radius:50%;background:rgba(11,196,227,0.15);border:1px solid rgba(11,196,227,0.3);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:0.8rem;color:var(--primary)}
+.team-detail strong{font-family:'Rajdhani',sans-serif;font-size:0.95rem;color:var(--white);display:block}
+.team-detail span{font-size:0.75rem;color:var(--text3)}
+
+.member-row{display:flex;gap:0.5rem;margin-bottom:0.5rem;align-items:center}
+.member-num{font-size:0.75rem;color:var(--text3);min-width:60px;font-weight:500}
+
+.alert{padding:0.75rem 1rem;border-radius:3px;font-size:0.85rem;margin-bottom:1rem}
+.alert-success{background:rgba(0,163,108,0.1);border:1px solid rgba(0,163,108,0.25);color:#00e896}
+.alert-warn{background:rgba(227,150,26,0.1);border:1px solid rgba(227,150,26,0.25);color:#f5b942}
+.alert-error{background:rgba(198,38,38,0.1);border:1px solid rgba(198,38,38,0.25);color:#ff6b6b}
+
+/* ROUND ROBIN TABLE */
+.rr-grid{overflow-x:auto;margin-bottom:1.5rem}
+.rr-table{border-collapse:collapse;min-width:400px}
+.rr-table th,.rr-table td{padding:0.5rem 0.85rem;border:1px solid var(--border);font-size:0.82rem;text-align:center}
+.rr-table th{font-family:'Rajdhani',sans-serif;font-weight:600;color:var(--text3);font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;background:var(--surface)}
+.rr-table td{color:var(--text2)}
+.rr-table td.team-name{text-align:left;font-family:'Rajdhani',sans-serif;font-size:0.9rem;color:var(--white);font-weight:600}
+.rr-table td.win{color:#00e896;font-weight:600}
+.rr-table td.loss{color:#ff6b6b}
+.rr-table td.self{background:rgba(51,51,51,0.3);color:var(--text3)}
+.rr-table td.pending{color:var(--text3)}
+
+/* GROUP STAGE */
+.groups-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:600px){.groups-grid{grid-template-columns:1fr}}
+.group-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.group-header{background:rgba(11,196,227,0.08);border-bottom:1px solid var(--border);padding:0.5rem 1rem;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:0.85rem;letter-spacing:2px;color:var(--primary);text-transform:uppercase}
+.group-team{display:flex;align-items:center;justify-content:space-between;padding:0.55rem 1rem;border-bottom:1px solid rgba(51,51,51,0.3);font-size:0.85rem}
+.group-team:last-child{border-bottom:none}
+.group-team .name{font-family:'Rajdhani',sans-serif;font-size:0.9rem;font-weight:600;color:var(--white)}
+.group-team .rec{font-size:0.8rem;color:var(--text3)}
+.group-team.advance .name{color:var(--primary)}
+.group-team.advance{background:rgba(11,196,227,0.03)}
+
+/* HERO BANNER */
+.hero{background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%);border:1px solid var(--border);border-radius:4px;padding:1.5rem 2rem;margin-bottom:1.5rem;position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center}
+.hero::before{content:'';position:absolute;right:-30px;top:-30px;width:200px;height:200px;background:radial-gradient(circle,rgba(11,196,227,0.08),transparent 70%);pointer-events:none}
+.hero-text h1{font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;color:var(--white);letter-spacing:2px;text-transform:uppercase;line-height:1.1}
+.hero-text h1 span{color:var(--primary)}
+.hero-text p{font-size:0.85rem;color:var(--text3);margin-top:0.4rem;letter-spacing:0.5px}
+.hero-stats{display:flex;gap:1.5rem}
+.hero-stat{text-align:center}
+.hero-stat .num{font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;color:var(--primary);line-height:1}
+.hero-stat .lbl{font-size:0.65rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+
+/* NOTICE */
+.notice{background:rgba(11,196,227,0.06);border:1px solid rgba(11,196,227,0.15);border-radius:3px;padding:0.75rem 1rem;font-size:0.82rem;color:var(--blue);margin-bottom:1rem}
+.divider{height:1px;background:var(--border);margin:1.5rem 0}
+
+.flex-between{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.flex-gap{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap}
+
+/* ADMIN */
+.admin-section{margin-bottom:2rem}
+.admin-table{width:100%;border-collapse:collapse;font-size:0.85rem}
+.admin-table th{font-family:'Rajdhani',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:0.6rem 0.75rem;text-align:left;border-bottom:1px solid var(--border);background:var(--surface)}
+.admin-table td{padding:0.6rem 0.75rem;border-bottom:1px solid rgba(51,51,51,0.3);color:var(--text2);vertical-align:middle}
+.admin-table tr:hover td{background:rgba(11,196,227,0.03)}
+.action-btns{display:flex;gap:4px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(6,17,30,0.85);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.active{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.75rem;max-width:500px;width:90%;max-height:85vh;overflow-y:auto;animation:fadeIn .2s ease}
+.modal-title{font-family:'Rajdhani',sans-serif;font-size:1.15rem;font-weight:700;color:var(--primary);letter-spacing:2px;text-transform:uppercase;margin-bottom:1.25rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border)}
+.modal-actions{display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1.25rem;padding-top:0.75rem;border-top:1px solid var(--border)}
+
+/* LOADING */
+.loading{text-align:center;padding:2rem;color:var(--text3);font-size:0.9rem}
+.loading::after{content:'';display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;margin-left:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* STATUS BADGES */
+.status-confirmed{color:#00e896}
+.status-registered{color:var(--primary)}
+
+/* RESPONSIVE NAV */
+@media(max-width:800px){
+  nav{flex-direction:column;gap:1rem}
+  .nav-tabs{flex-wrap:wrap;justify-content:center}
+  .hero{flex-direction:column;gap:1rem;text-align:center}
+  .hero-stats{justify-content:center}
+}

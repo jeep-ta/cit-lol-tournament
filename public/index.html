@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIT LoL eSports — Schedule</title>
+  <meta name="description"
+    content="CIT LoL eSports 2027 Championship - Match Schedule for the UNO-R College of Information Technology League of Legends Tournament">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;700&family=Barlow:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+  <div class="hex-bg"></div>
+  <div class="app">
+
+    <nav id="main-nav"></nav>
+
+    <div class="panel">
+      <div class="hero">
+        <div class="hero-text">
+          <h1>CIT LoL eSports<br><span>2027 Championship</span></h1>
+          <p>University of Negros Occidental – Recoletos · College of Information Technology</p>
+        </div>
+        <div class="hero-stats" id="countdown-container" style="display:none; gap: 2rem;">
+          <div class="hero-stat">
+            <div class="num" id="cd-days">--</div>
+            <div class="lbl">Days</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num" id="cd-hours">--</div>
+            <div class="lbl">Hours</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num" id="cd-mins">--</div>
+            <div class="lbl">Minutes</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num" id="cd-secs">--</div>
+            <div class="lbl">Seconds</div>
+          </div>
+        </div>
+        <div id="no-upcoming-msg"
+          style="margin-top:2rem; font-size:1.2rem; font-family:'Rajdhani',sans-serif; color:var(--text3); text-transform:uppercase; letter-spacing:2px; display:none;">
+          No upcoming matches scheduled.</div>
+      </div>
+
+      <div id="next-match-notice" class="notice" style="display:none"></div>
+
+      <div class="flex-between">
+        <div class="sec-head" style="flex:1;margin-bottom:0">
+          <div class="diamond"></div>
+          <div class="sec-title">Match Schedule</div>
+          <div class="sec-line"></div>
+        </div>
+        <div class="flex-gap" style="margin-left:1rem">
+          <select class="form-select" style="width:auto;padding:0.35rem 0.75rem;font-size:0.8rem" id="day-filter"
+            onchange="renderSchedule()">
+            <option value="all">All Days</option>
+            <option value="1">Day 1</option>
+            <option value="2">Day 2</option>
+            <option value="3">Day 3</option>
+          </select>
+        </div>
+      </div>
+      <div style="height:1rem"></div>
+      <div id="schedule-list">
+        <div class="loading">Loading schedule</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/js/shared.js"></script>
+  <script>
+    let matches = [];
+    let teams = [];
+
+    async function init() {
+      initNav('schedule');
+      try {
+        [matches, teams] = await Promise.all([API.get('/api/matches'), API.get('/api/teams')]);
+        // Find next upcoming match
+        const upcoming = matches.find(m => m.status === 'upcoming');
+        if (upcoming) {
+          const notice = document.getElementById('next-match-notice');
+          notice.style.display = 'block';
+          notice.innerHTML = `Next match: <strong>${upcoming.team1Name} vs ${upcoming.team2Name}</strong> — Day ${upcoming.day} · ${formatDateFull(upcoming.date)} · ${upcoming.time} via Remote Spectator`;
+
+          startCountdown(upcoming.date, upcoming.time);
+        } else {
+          document.getElementById('no-upcoming-msg').style.display = 'block';
+        }
+
+        renderSchedule();
+      } catch (e) {
+        document.getElementById('schedule-list').innerHTML = '<div class="alert alert-error">Failed to load schedule data.</div>';
+      }
+    }
+
+    function renderSchedule() {
+      const filter = document.getElementById('day-filter').value;
+      const filtered = filter === 'all' ? matches : matches.filter(m => m.day == filter);
+      let html = '';
+      let lastDay = 0;
+
+      filtered.forEach(m => {
+        if (m.day !== lastDay) {
+          lastDay = m.day;
+          html += `<div style="font-family:'Rajdhani',sans-serif;font-size:0.72rem;font-weight:700;letter-spacing:2px;color:var(--text3);text-transform:uppercase;margin:0.5rem 0 0.5rem;padding:0.3rem 0.75rem;background:var(--surface);border-left:2px solid var(--primary-dark)">Day ${m.day} — ${formatDate(m.date)}, 2027</div>`;
+        }
+        const badge = m.status === 'done' ? '<span class="badge badge-green">Completed</span>'
+          : m.status === 'upcoming' ? '<span class="badge badge-primary">Upcoming</span>'
+            : '<span class="badge badge-gray">TBD</span>';
+        const scoreDisplay = m.status === 'done' ? `${m.score1}–${m.score2}` : 'vs';
+        const scoreStyle = m.status === 'done' ? 'color:var(--primary)' : 'color:var(--text3);font-size:0.85rem';
+
+        html += `<div class="match-card">
+      <div class="match-date"><span class="day">${formatDate(m.date).split(' ')[1] || '?'}</span>${formatDate(m.date).split(' ')[0] || ''}</div>
+      <div class="match-vs">
+        <div class="match-team left">${m.team1Name}</div>
+        <div class="match-score" style="${scoreStyle}">${scoreDisplay}</div>
+        <div class="match-team">${m.team2Name}</div>
+      </div>
+      <div class="match-status">${badge}</div>
+    </div>`;
+      });
+
+      if (!html) html = '<div style="text-align:center;padding:2rem;color:var(--text3)">No matches found for this filter.</div>';
+      document.getElementById('schedule-list').innerHTML = html;
+    }
+
+    let countdownInterval;
+    function startCountdown(dateStr, timeStr) {
+      document.getElementById('countdown-container').style.display = 'flex';
+
+      let tStr = "00:00:00";
+      if (timeStr) {
+        let timeMatch = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (timeMatch) {
+          let [, h, m, p] = timeMatch;
+          h = parseInt(h);
+          if (p.toUpperCase() === 'PM' && h < 12) h += 12;
+          if (p.toUpperCase() === 'AM' && h === 12) h = 0;
+          tStr = `${h.toString().padStart(2, '0')}:${m}:00`;
+        }
+      }
+
+      // Construct ISO-like format string for reliable Date parsing
+      const targetDate = new Date(`${dateStr}T${tStr}`);
+
+      function updateTimer() {
+        const now = new Date().getTime();
+        const distance = targetDate.getTime() - now;
+
+        if (distance < 0) {
+          clearInterval(countdownInterval);
+          document.getElementById('countdown-container').innerHTML = '<div style="font-size:2rem;font-weight:700;color:var(--primary);text-transform:uppercase;font-family:\'Rajdhani\',sans-serif">Match Started</div>';
+          return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById('cd-days').textContent = days.toString().padStart(2, '0');
+        document.getElementById('cd-hours').textContent = hours.toString().padStart(2, '0');
+        document.getElementById('cd-mins').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('cd-secs').textContent = seconds.toString().padStart(2, '0');
+      }
+
+      updateTimer(); // Initial call
+      countdownInterval = setInterval(updateTimer, 1000);
+    }
+
+    init();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,318 @@
+{
+  "teams": [
+    {
+      "id": 7,
+      "name": "Alas Jez",
+      "section": "BSIT K21",
+      "members": [
+        {
+          "name": "Chritian John Patopatin",
+          "ign": "Chame #asdf",
+          "role": "captain"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        }
+      ],
+      "status": "confirmed",
+      "createdAt": "2026-04-01T17:18:11.347Z"
+    },
+    {
+      "id": 8,
+      "name": "Low Cortisol Gaming",
+      "section": "BSIT K23",
+      "members": [
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "captain"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "adf",
+          "role": "sub"
+        }
+      ],
+      "status": "confirmed",
+      "createdAt": "2026-04-01T17:20:56.018Z"
+    },
+    {
+      "id": 9,
+      "name": "IT Gods",
+      "section": "BSIT K24",
+      "members": [
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "captain"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "sadf",
+          "ign": "asdf",
+          "role": "sub"
+        }
+      ],
+      "status": "confirmed",
+      "createdAt": "2026-04-01T17:21:11.396Z"
+    },
+    {
+      "id": 10,
+      "name": "SEL09",
+      "section": "BSCS K32",
+      "members": [
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "captain"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "sadf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "player"
+        },
+        {
+          "name": "asdf",
+          "ign": "asdf",
+          "role": "sub"
+        }
+      ],
+      "status": "confirmed",
+      "createdAt": "2026-04-01T17:21:31.386Z"
+    }
+  ],
+  "matches": [
+    {
+      "id": 13,
+      "day": 1,
+      "date": "2026-04-01",
+      "time": "8:00PM",
+      "team1Id": 7,
+      "team2Id": 8,
+      "score1": 3,
+      "score2": 0,
+      "status": "done"
+    },
+    {
+      "id": 14,
+      "day": 1,
+      "date": "2026-04-01",
+      "time": "11:00PM",
+      "team1Id": 9,
+      "team2Id": 10,
+      "score1": 3,
+      "score2": 2,
+      "status": "done"
+    },
+    {
+      "id": 15,
+      "day": 2,
+      "date": "2026-04-02",
+      "time": "8:00PM",
+      "team1Id": 7,
+      "team2Id": 9,
+      "score1": 3,
+      "score2": 0,
+      "status": "done"
+    },
+    {
+      "id": 16,
+      "day": 2,
+      "date": "2026-04-02",
+      "time": "11:00PM",
+      "team1Id": 8,
+      "team2Id": 10,
+      "score1": 3,
+      "score2": 2,
+      "status": "done"
+    },
+    {
+      "id": 17,
+      "day": 3,
+      "date": "2026-04-03",
+      "time": "8:00PM",
+      "team1Id": 10,
+      "team2Id": 7,
+      "score1": 3,
+      "score2": 2,
+      "status": "done"
+    },
+    {
+      "id": 18,
+      "day": 3,
+      "date": "2026-04-03",
+      "time": "11:00PM",
+      "team1Id": 8,
+      "team2Id": 9,
+      "score1": 3,
+      "score2": 0,
+      "status": "done"
+    },
+    {
+      "id": 19,
+      "day": 4,
+      "date": "2026-04-04",
+      "time": "8:00PM",
+      "team1Id": 7,
+      "team2Id": 9,
+      "score1": 3,
+      "score2": 2,
+      "status": "done"
+    },
+    {
+      "id": 20,
+      "day": 4,
+      "date": "2026-04-04",
+      "time": "11:00PM",
+      "team1Id": 8,
+      "team2Id": 10,
+      "score1": 3,
+      "score2": 0,
+      "status": "done"
+    },
+    {
+      "id": 21,
+      "day": 5,
+      "date": "2026-04-05",
+      "time": "8:00PM",
+      "team1Id": 7,
+      "team2Id": 8,
+      "score1": 3,
+      "score2": 2,
+      "status": "done"
+    }
+  ],
+  "settings": {
+    "format": "single",
+    "seasonName": "2025 Championship",
+    "adminPassword": "admin",
+    "nextId": {
+      "teams": 11,
+      "matches": 22
+    },
+    "bracketData": {
+      "single": {
+        "qf1": {
+          "t1": "BYE",
+          "t2": "BYE",
+          "s1": "",
+          "s2": "",
+          "w": 0
+        },
+        "qf2": {
+          "t1": "BYE",
+          "t2": "BYE",
+          "s1": "",
+          "s2": "",
+          "w": 0
+        },
+        "qf3": {
+          "t1": "BYE",
+          "t2": "BYE",
+          "s1": "",
+          "s2": "",
+          "w": 0
+        },
+        "qf4": {
+          "t1": "BYE",
+          "t2": "BYE",
+          "s1": "",
+          "s2": "",
+          "w": 0
+        },
+        "sf1": {
+          "t1": "Alas Jez",
+          "t2": "IT Gods",
+          "s1": "3",
+          "s2": "2",
+          "w": 0
+        },
+        "sf2": {
+          "t1": "Low Cortisol Gaming",
+          "t2": "SEL09",
+          "s1": "3",
+          "s2": "0",
+          "w": 0
+        },
+        "f1": {
+          "t1": "Alas Jez",
+          "t2": "Low Cortisol Gaming",
+          "s1": "3",
+          "s2": "2",
+          "w": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIT LoL eSports — Admin Panel</title>
+  <meta name="description" content="Admin panel for managing the CIT LoL eSports 2027 tournament">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;700&family=Barlow:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+  <div class="hex-bg"></div>
+  <div class="app">
+
+    <nav id="main-nav"></nav>
+
+    <div class="panel">
+      <!-- HEADER -->
+      <div class="hero" style="margin-bottom:1.5rem">
+        <div class="hero-text">
+          <h1>Admin <span>Panel</span></h1>
+          <p>Manage teams, matches, and scores</p>
+        </div>
+        <div class="flex-gap">
+          <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+          <button class="btn btn-outline btn-sm" onclick="refreshAll()">↻ Refresh</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmReset()">Reset Data</button>
+        </div>
+      </div>
+
+      <div id="admin-alert" style="display:none"></div>
+
+      <!-- LOGIN SECTION -->
+      <div id="section-login" style="display:none; max-width:400px; margin: 4rem auto; text-align:center;">
+        <div class="sec-head" style="justify-content:center; margin-bottom:1rem">
+          <div class="diamond"></div>
+          <div class="sec-title" style="flex:none; padding:0 1rem;">Admin Login</div>
+          <div class="diamond"></div>
+        </div>
+        <div class="card" style="text-align:left">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-input" id="login-username" placeholder="Enter admin username">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="login-password" placeholder="Enter admin password">
+          </div>
+          <button class="btn btn-primary" style="width:100%" onclick="submitLogin()">Login</button>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="bracket-controls" style="margin-bottom:1.5rem" id="admin-tabs">
+        <button class="format-btn active" onclick="showSection('teams',this)" id="tab-teams">Teams (<span
+            id="team-count">0</span>)</button>
+        <button class="format-btn" onclick="showSection('matches',this)" id="tab-matches">Matches (<span
+            id="match-count">0</span>)</button>
+        <button class="format-btn" onclick="showSection('scores',this)" id="tab-scores">Enter Scores</button>
+        <button class="format-btn" onclick="showSection('bracket',this)" id="tab-bracket">Bracket</button>
+      </div>
+
+      <!-- TEAMS SECTION -->
+      <div class="admin-section" id="section-teams">
+        <div class="flex-between">
+          <div class="sec-head" style="flex:1;margin-bottom:0">
+            <div class="diamond"></div>
+            <div class="sec-title">Manage Teams</div>
+            <div class="sec-line"></div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="showAddTeamModal()" style="margin-left:1rem">+ Add
+            Team</button>
+        </div>
+        <div style="height:1rem"></div>
+        <div class="card" style="padding:0;overflow-x:auto">
+          <table class="admin-table" id="teams-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Team Name</th>
+                <th>Section</th>
+                <th>Players</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="6" class="loading">Loading teams</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MATCHES SECTION -->
+      <div class="admin-section" id="section-matches" style="display:none">
+        <div class="flex-between">
+          <div class="sec-head" style="flex:1;margin-bottom:0">
+            <div class="diamond"></div>
+            <div class="sec-title">Manage Matches</div>
+            <div class="sec-line"></div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="showAddMatchModal()" style="margin-left:1rem">+ Add
+            Match</button>
+        </div>
+        <div style="height:1rem"></div>
+        <div class="card" style="padding:0;overflow-x:auto">
+          <table class="admin-table" id="matches-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Day</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Team 1</th>
+                <th>Score</th>
+                <th>Team 2</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="9" class="loading">Loading matches</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SCORES SECTION -->
+      <div class="admin-section" id="section-scores" style="display:none">
+        <div class="sec-head">
+          <div class="diamond"></div>
+          <div class="sec-title">Enter Match Scores</div>
+          <div class="sec-line"></div>
+        </div>
+        <div class="notice">Select an upcoming match and enter the final score. The standings will be automatically
+          recalculated.</div>
+        <div id="scores-list">
+          <div class="loading">Loading matches</div>
+        </div>
+      </div>
+
+      <!-- BRACKET SECTION -->
+      <div class="admin-section" id="section-bracket" style="display:none">
+        <div class="sec-head">
+          <div class="diamond"></div>
+          <div class="sec-title">Tournament Bracket Editor</div>
+          <div class="sec-line"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Select Bracket Format</div>
+          <div class="bracket-controls" id="admin-format-btns" style="margin-bottom:1rem;justify-content:flex-start">
+            <button class="format-btn" data-fmt="single" onclick="setTournamentFormat('single',this)">Single
+              Elimination</button>
+            <button class="format-btn" data-fmt="double" onclick="setTournamentFormat('double',this)">Double
+              Elimination</button>
+            <button class="format-btn" data-fmt="roundrobin" onclick="setTournamentFormat('roundrobin',this)">Round
+              Robin</button>
+            <button class="format-btn" data-fmt="group" onclick="setTournamentFormat('group',this)">Group Stage</button>
+          </div>
+          <div id="admin-format-desc" style="font-size:0.82rem;color:var(--text3);margin-bottom:1rem">
+            Choose a format. Make sure to click "Save Bracket" after making manual assignments!
+          </div>
+          <div class="flex-between">
+            <div class="card-title" style="margin:0">Visual Bracket Configuration</div>
+            <button class="btn btn-primary btn-sm" onclick="saveBracketData()">Save Bracket</button>
+          </div>
+          <div style="height:1rem"></div>
+          <div id="admin-bracket-editor">
+            <div class="loading">Loading bracket editor</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal" id="modal-content"></div>
+    </div>
+
+  </div>
+
+  <script src="/js/shared.js"></script>
+  <script>
+    let teams = [], matches = [], settings = {};
+    let currentFormat = 'single';
+    let bracketData = {};
+
+    async function init() {
+      initNav('admin');
+      if (!localStorage.getItem('adminToken')) {
+        showLoginSection();
+      } else {
+        API.token = localStorage.getItem('adminToken');
+        showAdminContent();
+        await refreshAll();
+      }
+    }
+
+    function showLoginSection() {
+      document.getElementById('section-login').style.display = 'block';
+      document.getElementById('admin-tabs').style.display = 'none';
+      document.getElementById('section-teams').style.display = 'none';
+      document.getElementById('section-matches').style.display = 'none';
+      document.getElementById('section-scores').style.display = 'none';
+
+      const headerBtns = document.querySelector('.hero .flex-gap');
+      if (headerBtns) headerBtns.style.display = 'none';
+    }
+
+    function showAdminContent() {
+      document.getElementById('section-login').style.display = 'none';
+      document.getElementById('admin-tabs').style.display = 'flex';
+
+      const headerBtns = document.querySelector('.hero .flex-gap');
+      if (headerBtns) headerBtns.style.display = 'flex';
+
+      showSection('teams', document.getElementById('tab-teams'));
+    }
+
+    async function submitLogin() {
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-password').value;
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Login failed');
+
+        localStorage.setItem('adminToken', data.token);
+        API.token = data.token;
+        showAdminContent();
+        await refreshAll();
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+
+    async function refreshAll() {
+      try {
+        const [reqTeams, reqMatches, reqSettings] = await Promise.all([API.get('/api/teams'), API.get('/api/matches'), API.get('/api/settings')]);
+        teams = reqTeams;
+        matches = reqMatches;
+        settings = reqSettings;
+        currentFormat = settings.format || 'single';
+        bracketData = settings.bracketData || {};
+        document.getElementById('team-count').textContent = teams.length;
+        document.getElementById('match-count').textContent = matches.length;
+
+        // Update active format button
+        document.querySelectorAll('#admin-format-btns .format-btn').forEach(b => {
+          if (b.dataset.fmt === currentFormat) {
+            b.classList.add('active');
+          } else {
+            b.classList.remove('active');
+          }
+        });
+        renderTeams();
+        renderMatches();
+        renderScores();
+        renderAdminBracket();
+      } catch (e) {
+        showAlert('admin-alert', 'Failed to load data: ' + e.message, 'error');
+      }
+    }
+
+    function showSection(name, btn) {
+      ['teams', 'matches', 'scores', 'bracket'].forEach(s => {
+        document.getElementById('section-' + s).style.display = s === name ? 'block' : 'none';
+      });
+      document.querySelectorAll('#admin-tabs .format-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    async function setTournamentFormat(fmt, btn) {
+      try {
+        currentFormat = fmt;
+        await API.put('/api/settings', { format: fmt });
+        document.querySelectorAll('#admin-format-btns .format-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        renderAdminBracket();
+        showAlert('admin-alert', 'Tournament format updated successfully', 'success');
+      } catch (e) {
+        showAlert('admin-alert', 'Failed to update format: ' + e.message, 'error');
+      }
+    }
+
+    // ── Modal helpers ──────────────────────────────────────────
+    function openModal(html) {
+      document.getElementById('modal-content').innerHTML = html;
+      document.getElementById('modal-overlay').classList.add('active');
+    }
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+    }
+    document.getElementById('modal-overlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeModal();
+    });
+
+    // ── TEAMS ──────────────────────────────────────────────────
+    function renderTeams() {
+      const tbody = document.querySelector('#teams-table tbody');
+      if (teams.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:1.5rem">No teams registered</td></tr>';
+        return;
+      }
+      tbody.innerHTML = teams.map(t => {
+        const playerIGNs = t.members ? t.members.map(m => m.ign).join(', ') : '—';
+        const statusClass = t.status === 'confirmed' ? 'badge-green' : 'badge-primary';
+        return `<tr>
+      <td style="color:var(--text3)">${t.id}</td>
+      <td><strong style="color:var(--white)">${t.name}</strong></td>
+      <td>${t.section}</td>
+      <td style="font-size:0.78rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${playerIGNs}">${playerIGNs}</td>
+      <td><span class="badge ${statusClass}">${t.status}</span></td>
+      <td>
+        <div class="action-btns">
+          <button class="btn btn-outline btn-sm" onclick="toggleTeamStatus(${t.id})">${t.status === 'confirmed' ? 'Unconfirm' : 'Confirm'}</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteTeam(${t.id},'${t.name.replace(/'/g, "\\'")}')">Del</button>
+        </div>
+      </td>
+    </tr>`;
+      }).join('');
+    }
+
+    function showAddTeamModal() {
+      let memberFields = '';
+      for (let i = 1; i <= 5; i++) {
+        memberFields += `<div class="member-row">
+      <span class="member-num">P${i}${i === 1 ? ' (C)' : ''}</span>
+      <input class="form-input" id="modal-pn-${i}" placeholder="Name" style="flex:1">
+      <input class="form-input" id="modal-pi-${i}" placeholder="IGN" style="flex:1;margin-left:4px">
+    </div>`;
+      }
+      memberFields += `<div class="member-row">
+    <span class="member-num">Sub</span>
+    <input class="form-input" id="modal-pn-6" placeholder="Name (opt)" style="flex:1">
+    <input class="form-input" id="modal-pi-6" placeholder="IGN (opt)" style="flex:1;margin-left:4px">
+  </div>`;
+
+      openModal(`
+    <div class="modal-title">Add New Team</div>
+    <div class="form-group"><label class="form-label">Team Name</label><input class="form-input" id="modal-team-name" placeholder="Team name"></div>
+    <div class="form-group"><label class="form-label">Section</label><input class="form-input" id="modal-team-section" placeholder="e.g., BSIT 3A"></div>
+    <div class="form-group"><label class="form-label">Members</label>${memberFields}</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="submitAddTeam()">Add Team</button>
+    </div>
+  `);
+    }
+
+    async function submitAddTeam() {
+      const name = document.getElementById('modal-team-name').value.trim();
+      const section = document.getElementById('modal-team-section').value.trim();
+      if (!name || !section) { alert('Name and section required'); return; }
+
+      const members = [];
+      for (let i = 1; i <= 5; i++) {
+        const n = document.getElementById(`modal-pn-${i}`).value.trim();
+        const g = document.getElementById(`modal-pi-${i}`).value.trim();
+        if (!n || !g) { alert(`Player ${i} name and IGN required`); return; }
+        members.push({ name: n, ign: g, role: i === 1 ? 'captain' : 'player' });
+      }
+      const sn = document.getElementById('modal-pn-6').value.trim();
+      const si = document.getElementById('modal-pi-6').value.trim();
+      if (sn && si) members.push({ name: sn, ign: si, role: 'sub' });
+
+      try {
+        await API.post('/api/teams', { name, section, members });
+        closeModal();
+        showAlert('admin-alert', `Team "${name}" added`, 'success');
+        await refreshAll();
+      } catch (e) { alert(e.message); }
+    }
+
+    async function toggleTeamStatus(id) {
+      const team = teams.find(t => t.id === id);
+      if (!team) return;
+      const newStatus = team.status === 'confirmed' ? 'registered' : 'confirmed';
+      try {
+        await API.put(`/api/teams/${id}`, { status: newStatus });
+        await refreshAll();
+      } catch (e) { alert(e.message); }
+    }
+
+    function deleteTeam(id, name) {
+      openModal(`
+    <div class="modal-title">Delete Team</div>
+    <div style="margin-bottom:1.5rem">Are you sure you want to delete <strong style="color:var(--primary)">${name}</strong>? This cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmDeleteTeam(${id}, '${name.replace(/'/g, "\\'")}')">Delete</button>
+    </div>
+  `);
+    }
+
+    async function confirmDeleteTeam(id, name) {
+      try {
+        await API.delete(`/api/teams/${id}`);
+        closeModal();
+        showAlert('admin-alert', `Team "${name}" deleted`, 'success');
+        await refreshAll();
+      } catch (e) {
+        closeModal();
+        showAlert('admin-alert', 'Delete failed: ' + e.message, 'error');
+      }
+    }
+
+    // ── MATCHES ────────────────────────────────────────────────
+    function renderMatches() {
+      const tbody = document.querySelector('#matches-table tbody');
+      if (matches.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:1.5rem">No matches</td></tr>';
+        return;
+      }
+      tbody.innerHTML = matches.map(m => {
+        const scoreDisplay = m.status === 'done' ? `${m.score1}–${m.score2}` : '—';
+        const statusBadge = m.status === 'done' ? 'badge-green' : m.status === 'upcoming' ? 'badge-primary' : 'badge-gray';
+        return `<tr>
+      <td style="color:var(--text3)">${m.id}</td>
+      <td>${m.day}</td>
+      <td>${formatDate(m.date)}</td>
+      <td style="font-size:0.8rem">${m.time || '—'}</td>
+      <td><strong style="color:var(--white)">${m.team1Name}</strong></td>
+      <td style="font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--primary)">${scoreDisplay}</td>
+      <td><strong style="color:var(--white)">${m.team2Name}</strong></td>
+      <td><span class="badge ${statusBadge}">${m.status}</span></td>
+      <td>
+        <div class="action-btns">
+          <button class="btn btn-outline btn-sm" onclick="showEditMatchModal(${m.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteMatch(${m.id})">Del</button>
+        </div>
+      </td>
+    </tr>`;
+      }).join('');
+    }
+
+    function teamOptions(selectedId) {
+      return `<option value="">TBD</option>` + teams.map(t =>
+        `<option value="${t.id}" ${t.id === selectedId ? 'selected' : ''}>${t.name}</option>`
+      ).join('');
+    }
+
+    function showAddMatchModal() {
+      openModal(`
+    <div class="modal-title">Add New Match</div>
+    <div class="grid2">
+      <div class="form-group"><label class="form-label">Day</label><input class="form-input" id="modal-m-day" type="number" min="1" value="1"></div>
+      <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="modal-m-date" type="date"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Time</label><input class="form-input" id="modal-m-time" placeholder="e.g., 01:00 PM"></div>
+    <div class="grid2">
+      <div class="form-group"><label class="form-label">Team 1</label><select class="form-select" id="modal-m-t1">${teamOptions()}</select></div>
+      <div class="form-group"><label class="form-label">Team 2</label><select class="form-select" id="modal-m-t2">${teamOptions()}</select></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-select" id="modal-m-status">
+        <option value="upcoming">Upcoming</option>
+        <option value="tbd">TBD</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="submitAddMatch()">Add Match</button>
+    </div>
+  `);
+    }
+
+    async function submitAddMatch() {
+      const day = parseInt(document.getElementById('modal-m-day').value) || 1;
+      const date = document.getElementById('modal-m-date').value;
+      const time = document.getElementById('modal-m-time').value.trim() || '01:00 PM';
+      const team1Id = parseInt(document.getElementById('modal-m-t1').value) || null;
+      const team2Id = parseInt(document.getElementById('modal-m-t2').value) || null;
+      const status = document.getElementById('modal-m-status').value;
+
+      try {
+        await API.post('/api/matches', { day, date, time, team1Id, team2Id, status });
+        closeModal();
+        showAlert('admin-alert', 'Match added', 'success');
+        await refreshAll();
+      } catch (e) { alert(e.message); }
+    }
+
+    function showEditMatchModal(id) {
+      const m = matches.find(x => x.id === id);
+      if (!m) return;
+      openModal(`
+    <div class="modal-title">Edit Match #${m.id}</div>
+    <div class="grid2">
+      <div class="form-group"><label class="form-label">Day</label><input class="form-input" id="modal-m-day" type="number" min="1" value="${m.day}"></div>
+      <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="modal-m-date" type="date" value="${m.date || ''}"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Time</label><input class="form-input" id="modal-m-time" value="${m.time || ''}"></div>
+    <div class="grid2">
+      <div class="form-group"><label class="form-label">Team 1</label><select class="form-select" id="modal-m-t1">${teamOptions(m.team1Id)}</select></div>
+      <div class="form-group"><label class="form-label">Team 2</label><select class="form-select" id="modal-m-t2">${teamOptions(m.team2Id)}</select></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-select" id="modal-m-status">
+        <option value="upcoming" ${m.status === 'upcoming' ? 'selected' : ''}>Upcoming</option>
+        <option value="tbd" ${m.status === 'tbd' ? 'selected' : ''}>TBD</option>
+        <option value="done" ${m.status === 'done' ? 'selected' : ''}>Done</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="submitEditMatch(${m.id})">Save</button>
+    </div>
+  `);
+    }
+
+    async function submitEditMatch(id) {
+      const day = parseInt(document.getElementById('modal-m-day').value) || 1;
+      const date = document.getElementById('modal-m-date').value;
+      const time = document.getElementById('modal-m-time').value.trim();
+      const team1Id = parseInt(document.getElementById('modal-m-t1').value) || null;
+      const team2Id = parseInt(document.getElementById('modal-m-t2').value) || null;
+      const status = document.getElementById('modal-m-status').value;
+
+      try {
+        await API.put(`/api/matches/${id}`, { day, date, time, team1Id, team2Id, status });
+        closeModal();
+        showAlert('admin-alert', 'Match updated', 'success');
+        await refreshAll();
+      } catch (e) { alert(e.message); }
+    }
+
+    function deleteMatch(id) {
+      openModal(`
+    <div class="modal-title">Delete Match</div>
+    <div style="margin-bottom:1.5rem">Are you sure you want to delete Match #<strong style="color:var(--primary)">${id}</strong>?</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="confirmDeleteMatch(${id})">Delete</button>
+    </div>
+  `);
+    }
+
+    async function confirmDeleteMatch(id) {
+      try {
+        await API.delete(`/api/matches/${id}`);
+        closeModal();
+        showAlert('admin-alert', `Match #${id} deleted`, 'success');
+        await refreshAll();
+      } catch (e) {
+        closeModal();
+        showAlert('admin-alert', 'Delete failed: ' + e.message, 'error');
+      }
+    }
+
+    // ── SCORES ─────────────────────────────────────────────────
+    function renderScores() {
+      const pending = matches.filter(m => m.status === 'upcoming' || m.status === 'tbd');
+      const done = matches.filter(m => m.status === 'done');
+
+      let html = '';
+
+      if (pending.length > 0) {
+        html += '<div class="card"><div class="card-title">Pending Matches — Enter Scores</div>';
+        pending.forEach(m => {
+          html += `<div class="match-card" style="flex-wrap:wrap">
+        <div class="match-vs" style="flex:1">
+          <div class="match-team left">${m.team1Name}</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input class="form-input" id="score-${m.id}-1" type="number" min="0" style="width:50px;text-align:center;padding:0.4rem" placeholder="0">
+            <span style="color:var(--text3);font-weight:700">–</span>
+            <input class="form-input" id="score-${m.id}-2" type="number" min="0" style="width:50px;text-align:center;padding:0.4rem" placeholder="0">
+          </div>
+          <div class="match-team">${m.team2Name}</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="submitScore(${m.id})" style="margin-top:0.5rem">Save Score</button>
+      </div>`;
+        });
+        html += '</div>';
+      }
+
+      if (done.length > 0) {
+        html += '<div class="card" style="margin-top:1rem"><div class="card-title">Completed Matches</div>';
+        done.forEach(m => {
+          html += `<div class="match-card">
+        <div class="match-date"><span class="day">${formatDate(m.date).split(' ')[1] || '?'}</span>${formatDate(m.date).split(' ')[0] || ''}</div>
+        <div class="match-vs">
+          <div class="match-team left">${m.team1Name}</div>
+          <div class="match-score" style="color:var(--primary)">${m.score1}–${m.score2}</div>
+          <div class="match-team">${m.team2Name}</div>
+        </div>
+        <span class="badge badge-green">Done</span>
+      </div>`;
+        });
+        html += '</div>';
+      }
+
+      if (!html) html = '<div style="text-align:center;padding:2rem;color:var(--text3)">No matches to display.</div>';
+      document.getElementById('scores-list').innerHTML = html;
+    }
+
+    async function submitScore(id) {
+      const val1 = document.getElementById(`score-${id}-1`).value.trim();
+      const val2 = document.getElementById(`score-${id}-2`).value.trim();
+      if (val1 === '' && val2 === '') { alert('Please enter at least one score to save.'); return; }
+
+      const s1 = parseInt(val1) || 0;
+      const s2 = parseInt(val2) || 0;
+
+      try {
+        await API.put(`/api/matches/${id}/score`, { score1: s1, score2: s2 });
+        showAlert('admin-alert', 'Score saved! Match finalized and standings updated.', 'success');
+        await refreshAll();
+      } catch (e) { alert('Save failed: ' + e.message); }
+    }
+
+    // ── RESET ──────────────────────────────────────────────────
+    function logout() {
+      localStorage.removeItem('adminToken');
+      API.token = null;
+      location.reload();
+    }
+
+    function confirmReset() {
+      openModal(`
+    <div class="modal-title" style="color:var(--red)">Reset Data</div>
+    <div style="margin-bottom:1.5rem">⚠ Reset ALL tournament data to defaults? This will delete all custom teams, matches, and scores. This cannot be undone!</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="executeReset()">Yes, Reset Data</button>
+    </div>
+  `);
+    }
+
+    async function executeReset() {
+      try {
+        await API.post('/api/reset');
+        closeModal();
+        showAlert('admin-alert', 'Tournament data reset to defaults.', 'success');
+        await refreshAll();
+      } catch (e) {
+        closeModal();
+        showAlert('admin-alert', 'Reset failed: ' + e.message, 'error');
+      }
+    }
+
+    // ── BRACKET EDITOR ─────────────────────────────────────────
+    function renderAdminBracket() {
+      const v = document.getElementById('admin-bracket-editor');
+      if (currentFormat === 'single') v.innerHTML = renderAdminSingleElim();
+      else if (currentFormat === 'double') v.innerHTML = renderAdminDoubleElim();
+      else if (currentFormat === 'roundrobin') v.innerHTML = renderAdminRoundRobin();
+      else v.innerHTML = renderAdminGroupStage();
+    }
+
+    function adminBMatch(slotId) {
+      const d = (bracketData[currentFormat] && bracketData[currentFormat][slotId]) || { t1: 'TBD', t2: 'TBD', s1: '', s2: '', w: 0 };
+      const esc = str => (str || '').replace(/"/g, '&quot;');
+      const teamOptions = (sel) => `<option value="TBD" ${sel === 'TBD' ? 'selected' : ''}>TBD</option><option value="BYE" ${sel === 'BYE' ? 'selected' : ''}>BYE</option>`
+        + teams.map(t => `<option value="${esc(t.name)}" ${sel === t.name ? 'selected' : ''}>${esc(t.name)}</option>`).join('');
+
+      return `<div class="b-match" data-slot="${slotId}" style="border:1px dashed var(--primary); padding:8px; background:rgba(0,0,0,0.3); border-radius:4px; min-width:200px">
+    <div style="font-size:0.6rem; color:var(--text3); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px">Match ${slotId}</div>
+    <div style="display:flex;align-items:center;gap:4px;margin-bottom:6px">
+      <input type="radio" name="win_${slotId}" class="w-rad" value="1" ${d.w === 1 ? 'checked' : ''} title="Team 1 Wins">
+      <select class="form-select t1-sel" style="padding:0.2rem;font-size:0.75rem;height:auto;flex:1">${teamOptions(d.t1)}</select>
+      <input type="text" class="form-input s1-in" value="${esc(d.s1)}" style="width:35px;padding:0.2rem;text-align:center;font-size:0.75rem" placeholder="-">
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;margin-bottom:6px">
+      <input type="radio" name="win_${slotId}" class="w-rad" value="2" ${d.w === 2 ? 'checked' : ''} title="Team 2 Wins">
+      <select class="form-select t2-sel" style="padding:0.2rem;font-size:0.75rem;height:auto;flex:1">${teamOptions(d.t2)}</select>
+      <input type="text" class="form-input s2-in" value="${esc(d.s2)}" style="width:35px;padding:0.2rem;text-align:center;font-size:0.75rem" placeholder="-">
+    </div>
+    <div style="text-align:right">
+      <label style="font-size:0.6rem;cursor:pointer;color:var(--text3)"><input type="radio" name="win_${slotId}" class="w-rad" value="0" ${!d.w || d.w === 0 ? 'checked' : ''}> Pending</label>
+    </div>
+  </div>`;
+    }
+
+    function renderAdminSingleElim() {
+      return `<div class="bracket-wrap" style="overflow-x:auto; padding-bottom:1rem"><div class="bracket">
+    <div class="bracket-round"><div class="round-label">Quarterfinals</div>
+      ${adminBMatch('qf1')}
+      <div style="height:0.5rem"></div>
+      ${adminBMatch('qf2')}
+      <div class="b-spacer"></div>
+      ${adminBMatch('qf3')}
+      <div style="height:0.5rem"></div>
+      ${adminBMatch('qf4')}
+    </div>
+    <div class="bracket-round"><div class="round-label">Semifinals</div>
+      <div style="height:2rem"></div>
+      ${adminBMatch('sf1')}
+      <div class="b-spacer"></div>
+      ${adminBMatch('sf2')}
+    </div>
+    <div class="bracket-round"><div class="round-label">Grand Final</div>
+      <div style="height:5.5rem"></div>
+      ${adminBMatch('f1')}
+    </div>
+  </div></div>`;
+    }
+
+    function renderAdminDoubleElim() {
+      return `<div class="card-title" style="color:var(--primary)">Winners Bracket</div>
+  <div class="bracket-wrap" style="overflow-x:auto; padding-bottom:1rem"><div class="bracket">
+    <div class="bracket-round"><div class="round-label">Round 1 (W)</div>
+      ${adminBMatch('w1_1')}
+      <div style="height:0.5rem"></div>
+      ${adminBMatch('w1_2')}
+      <div style="height:0.5rem"></div>
+      ${adminBMatch('w1_3')}
+    </div>
+    <div class="bracket-round"><div class="round-label">Semis (W)</div>
+      <div style="height:1.5rem"></div>
+      ${adminBMatch('wsf_1')}
+      <div class="b-spacer"></div>
+      ${adminBMatch('wsf_2')}
+    </div>
+    <div class="bracket-round"><div class="round-label">Winners Final</div>
+      <div style="height:4rem"></div>
+      ${adminBMatch('wf_1')}
+    </div>
+  </div></div>
+  <div class="card-title" style="margin-top:2rem;color:var(--red)">Losers Bracket</div>
+  <div class="bracket-wrap" style="overflow-x:auto; padding-bottom:1rem"><div class="bracket">
+    <div class="bracket-round"><div class="round-label">LB Round 1</div>
+      ${adminBMatch('l1_1')}
+      <div style="height:0.5rem"></div>
+      ${adminBMatch('l1_2')}
+    </div>
+    <div class="bracket-round"><div class="round-label">LB Round 2</div>
+      <div style="height:1.5rem"></div>
+      ${adminBMatch('l2_1')}
+    </div>
+    <div class="bracket-round"><div class="round-label">LB Final</div>
+      <div style="height:1.5rem"></div>
+      ${adminBMatch('lf_1')}
+    </div>
+  </div></div>`;
+    }
+
+    function renderAdminRoundRobin() {
+      return `<div class="notice">Round Robin format uses a standings matrix that operates automatically based on Match scores. There is no graphical bracket tree to configure. Please use the <strong>Enter Scores</strong> tab!</div>`;
+    }
+
+    function renderAdminGroupStage() {
+      return `<div class="notice" style="margin-bottom:1rem">Group positions operate automatically based on match scores. However, you have complete manual control over the graphical Knockout Stage below:</div>
+  <div class="card-title" style="color:var(--primary)">Knockout Stage (Top 2 from each group)</div>
+  <div class="bracket-wrap" style="overflow-x:auto; padding-bottom:1rem"><div class="bracket">
+    <div class="bracket-round"><div class="round-label">Semifinals</div>
+      ${adminBMatch('gs_sf1')}
+      <div style="height:1rem"></div>
+      ${adminBMatch('gs_sf2')}
+    </div>
+    <div class="bracket-round"><div class="round-label">Grand Final</div>
+      <div style="height:3rem"></div>
+      ${adminBMatch('gs_f1')}
+    </div>
+  </div></div>`;
+    }
+
+    async function saveBracketData() {
+      if (!bracketData[currentFormat]) bracketData[currentFormat] = {};
+
+      document.querySelectorAll('#admin-bracket-editor .b-match').forEach(m => {
+        const slot = m.dataset.slot;
+        const t1 = m.querySelector('.t1-sel')?.value;
+        const t2 = m.querySelector('.t2-sel')?.value;
+        const s1 = m.querySelector('.s1-in')?.value;
+        const s2 = m.querySelector('.s2-in')?.value;
+        const checked = m.querySelector('.w-rad:checked');
+        const w = checked ? parseInt(checked.value) : 0;
+
+        bracketData[currentFormat][slot] = { t1, t2, s1, s2, w };
+      });
+
+      try {
+        await API.put('/api/settings', { bracketData });
+        settings.bracketData = bracketData;
+        showAlert('admin-alert', 'Visual bracket saved successfully! Changes apply to the public page immediately.', 'success');
+      } catch (e) {
+        showAlert('admin-alert', 'Failed to save bracket: ' + e.message, 'error');
+      }
+    }
+
+    init();
+  </script>
+</body>
+
+</html>
